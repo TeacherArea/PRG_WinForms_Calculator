@@ -2,9 +2,11 @@ namespace PRG1_Calculator
 {
     public partial class Form1 : Form
     {
+        private bool calculationCompleted = false; // denna visade sig viktig för att avgöra status på variablerna
         private double accumulator = 0;
         private string userInput = "";
         private string operation = "";
+        private double operand = 0;
         private float originalFontSizeTextBox, originalFontSizeButton, originalFormWidth, originalFormHeight;
 
         public Form1()
@@ -80,44 +82,124 @@ namespace PRG1_Calculator
 
         #endregion
 
+        // Det kan vara smart att ha denna som en egen metod, för att hålla reda 
+        // på vad som ska finnas i de olika variablerna
+        private void UpdateInput(string value)
+        {
+            if (calculationCompleted)
+            {
+                btn_clear.PerformClick();
+                txtB_Show.Text = "";
+                calculationCompleted = false;
+            }
+
+            if (txtB_Show.Text == "0" && value != "." && !"C".Contains(value))
+            {
+                txtB_Show.Text = "";
+            }
+
+            if (value == "+" || value == "-" || value == "*" || value == "/")
+            {
+                if (!string.IsNullOrEmpty(operation) && !string.IsNullOrEmpty(userInput))
+                {
+                    btn_equal.PerformClick();
+                }
+                else if (!string.IsNullOrEmpty(userInput))
+                {
+                    operand = double.Parse(userInput);
+                    accumulator = operand;
+                    userInput = "";
+                }
+                operation = value;
+                txtB_Show.Text += "" + value + "";
+            }
+
+            else if (value == "C")
+            {
+                btn_clear.PerformClick();
+            }
+            else
+            {
+                userInput += value;
+                txtB_Show.Text += value;
+            }
+        }
+
         private void NumberButton_Click(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            userInput += button.Text;
-            txtB_Show.Text = userInput;
+            UpdateInput(button.Text);
         }
 
         private void OperatorButton_Click(object sender, EventArgs e)
         {
-            if (userInput == "")
+            Button button = (Button)sender;
+            string selectedOperation = button.Text;
+
+            if (!string.IsNullOrEmpty(userInput))
+            {
+                if (!double.TryParse(userInput, out operand))
+                {
+                    txtB_Show.Text = "Ogiltig inmatning";
+                    return;
+                }
+
+                if (!string.IsNullOrEmpty(operation))
+                {
+                    Calculate();
+                }
+                else
+                {
+                    accumulator = operand;
+                }
+                operation = selectedOperation;
+                userInput = "";
+            }
+            else if (accumulator != 0)
+            {
+                operation = selectedOperation;
+            }
+            else
             {
                 txtB_Show.Text = "Ange ett nummer först";
-                return;
             }
+            txtB_Show.Text = accumulator + "" + operation + "";
 
-            Button button = (Button)sender;
-            operation = button.Text;
-
-            // lägg märke till att ett korrekt userInput (ett valt räknesätt) framöver heter "accumulator"
-            if (!double.TryParse(userInput, out accumulator))
-            {
-                txtB_Show.Text = "Ogiltig inmatning";
-                return;
-            }
-            userInput = "";
-            txtB_Show.Text += button.Text;
+            calculationCompleted = false;
         }
 
         private void btn_equal_Click(object sender, EventArgs e)
         {
-            double operand;
-            // lägg märke till att ett korrekt userInput framöver heter "operand"
-            if (!double.TryParse(userInput, out operand))
+            if (!string.IsNullOrEmpty(userInput))
             {
-                txtB_Show.Text = "Ogiltig inmatning";
+                if (!double.TryParse(userInput, out operand))
+                {
+                    txtB_Show.Text = "Ogiltig inmatning";
+                    return;
+                }
+            }
+            else if (accumulator != 0 && !string.IsNullOrEmpty(operation))
+            {
+                operand = accumulator;
+            }
+            else
+            {
                 return;
             }
 
+            Calculate();
+
+            txtB_Show.Text = accumulator.ToString();
+            userInput = "";
+            operation = "";
+
+            calculationCompleted = true;
+        }
+
+        // Nu har denna del blivit självständig, för att kunna anropas
+        // från mer än ett ställe
+        private void Calculate()
+        {
             switch (operation)
             {
                 case "+":
@@ -138,11 +220,6 @@ namespace PRG1_Calculator
                     accumulator *= operand;
                     break;
             }
-
-            txtB_Show.Text = accumulator.ToString();
-            userInput = "";
-            accumulator = 0;
-            operation = "";
         }
 
         private void btn_clear_Click(object sender, EventArgs e)
