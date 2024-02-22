@@ -3,6 +3,7 @@ namespace PRG1_Calculator
     public partial class Form1 : Form
     {
         private double accumulator = 0;
+        private double operand = 0;
         private string userInput = "";
         private string operation = "";
         private float originalFontSizeTextBox, originalFontSizeButton, originalFormWidth, originalFormHeight;
@@ -83,41 +84,25 @@ namespace PRG1_Calculator
         private void NumberButton_Click(object sender, EventArgs e)
         {
             Button button = (Button)sender;
-            userInput += button.Text;
-            txtB_Show.Text = userInput;
+            txtB_Show.Text = button.Text;
         }
 
         private void OperatorButton_Click(object sender, EventArgs e)
         {
+            /* framtida test så att inte användaren råkar trycka på +- / * först
             if (userInput == "")
             {
-                txtB_Show.Text = "Ange ett nummer först";
+                MessageBox.Show("Ange ett nummer först", "Meddelande", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            */
 
             Button button = (Button)sender;
-            operation = button.Text;
-
-            // lägg märke till att ett korrekt userInput (ett valt räknesätt) framöver heter "accumulator"
-            if (!double.TryParse(userInput, out accumulator))
-            {
-                txtB_Show.Text = "Ogiltig inmatning";
-                return;
-            }
-            userInput = "";
-            txtB_Show.Text += button.Text;
+            txtB_Show.Text = button.Text;
         }
 
         private void btn_equal_Click(object sender, EventArgs e)
         {
-            double operand;
-            // lägg märke till att ett korrekt userInput framöver heter "operand"
-            if (!double.TryParse(userInput, out operand))
-            {
-                txtB_Show.Text = "Ogiltig inmatning";
-                return;
-            }
-
             switch (operation)
             {
                 case "+":
@@ -140,27 +125,28 @@ namespace PRG1_Calculator
             }
 
             txtB_Show.Text = accumulator.ToString();
-            userInput = "";
             accumulator = 0;
+            userInput = "";
             operation = "";
         }
 
         private void btn_clear_Click(object sender, EventArgs e)
         {
-            userInput = "";
-            accumulator = 0;
+            userInput = "";         
             operation = "";
             txtB_Show.Text = "0";
+            operand = 0;
+            accumulator = 0;
         }
 
         private void btn_storeInMemory_Click(object sender, EventArgs e)
         {
-            txtB_Show.Text = "Kommande funktion";
+            MessageBox.Show("Kommande funktion", "Meddelande", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btn_catchFromMemory_Click(object sender, EventArgs e)
         {
-            txtB_Show.Text = "Kommande funktion";
+            MessageBox.Show("Kommande funktion", "Meddelande", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
