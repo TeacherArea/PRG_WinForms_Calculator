@@ -1,6 +1,6 @@
 namespace PRG1_Calculator
 {
-    public partial class Form1 : Form
+    public partial class Form_Calc : Form
     {
         private double accumulator = 0;
         private double operand = 0;
@@ -8,7 +8,7 @@ namespace PRG1_Calculator
         private string operation = "";
         private float originalFontSizeTextBox, originalFontSizeButton, originalFormWidth, originalFormHeight;
 
-        public Form1()
+        public Form_Calc()
         {
             InitializeComponent();
             // ClientSize.Height och ClientSize.Width ger storleken på formuläret utan titel och fönsterram
